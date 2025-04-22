@@ -1,0 +1,40 @@
+name: Deploy to Caddy Server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 设置Node.js环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # 使用专门的pnpm setup action
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      # 构建静态站点
+      - name: Build static site
+        run: |
+          pnpm install
+          pnpm run build
+
+      # 通过SSH部署文件到服务器
+      - name: Deploy via SSH
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: './dist/*' # 静态文件构建后的目录
+          target: '/root/caddy_app/site' # 宿主机挂载到Caddy容器的目录
