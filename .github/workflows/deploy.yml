@@ -36,5 +36,6 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: './dist/*' # 静态文件构建后的目录
-          target: '/root/caddy_app/site' # 宿主机挂载到Caddy容器的目录
+          source: 'dist/*' # 静态文件构建后的目录内容
+          target: '/root/caddy_app/site/' # 宿主机挂载到Caddy容器的目录
+          strip_components: 1 # 移除路径中的第一个组件(dist目录)
